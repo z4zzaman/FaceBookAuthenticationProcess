@@ -4,21 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 
@@ -64,7 +56,10 @@ public class LoginActivity extends AppCompatActivity {
                           @Override
                           public void onSuccess(LoginResult loginResult) {
                               // App code
-                              setFacebookData(loginResult);
+                            //  setFacebookData(loginResult);
+                              Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                              intent.putExtra("AccessToken", loginResult.getAccessToken());
+                              startActivity(intent);
                           }
 
                           @Override
@@ -79,68 +74,8 @@ public class LoginActivity extends AppCompatActivity {
                       });
           }
       });
-
-
     }
 
-    private void setFacebookData(final LoginResult loginResult)
-    {
-        GraphRequest request = GraphRequest.newMeRequest(
-                loginResult.getAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        // Application code
-                        // Here also possible to get data from object
-                        try {
-                            Log.i("Response",response.toString());
-
-                            String email = response.getJSONObject().getString("email");
-                            String firstName = response.getJSONObject().getString("first_name");
-                            String lastName = response.getJSONObject().getString("last_name");
-                            String gender = response.getJSONObject().getString("gender");
-                            String birthday = response.getJSONObject().getString("birthday");
-
-
-
-                            Profile profile = Profile.getCurrentProfile();
-                            String id = profile.getId();
-                            String link = profile.getLinkUri().toString();
-                            Log.i("Link",link);
-                            if (Profile.getCurrentProfile()!=null)
-                            {
-                                Log.i("Login", "ProfilePic:: " + Profile.getCurrentProfile().getProfilePictureUri(200, 200));
-                            }
-
-                            Log.i("Login" + " Email", email);
-                            Log.i("Login"+ " FirstName", firstName);
-                            Log.i("Login" + " LastName", lastName);
-                            Log.i("Login" + " Gender", gender);
-                            Log.i("Login" + " Birthday", birthday);
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,email,gender,birthday, first_name,last_name");
-        request.setParameters(parameters);
-        request.executeAsync();
-
-    /*    replace parameters.putString("fields", "id,email,first_name,last_name");
-        with parameters.putString("fields", "id,email,first_name,last_name,friends");
-        Add below logic to get friends Data*/
-
-/*        if (object.has("friends")) {
-            JSONObject friend = object.getJSONObject("friends");
-            JSONArray data = friend.getJSONArray("data");
-            for (int i=0;i<data.length();i++){
-                Log.i("idddd",data.getJSONObject(i).getString("id"));
-            }
-        }*/
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
